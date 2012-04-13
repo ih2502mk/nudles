@@ -21,7 +21,7 @@ var paraLize = function(tasks, callback) {
       else {
         toComplete -= 1;
         results[key] = args;
-        if(toComplete === 0) { // sooo counterintuitive
+        if(toComplete === 0) {
           callback(err, results);
         }
       }
@@ -134,32 +134,3 @@ var childOut = (function(){
 
 exports.paraLize = paraLize; // no need to expose this actually
 exports.childOut = childOut;
-
-/*
-para({
-  'first' : function(cb) {
-    console.log('first fires');
-    setTimeout(function(){
-      console.log('first fires cb');
-      cb(null, 'I\'m first');
-    }, 800);
-  },
-  'second' : function(cb) {
-    console.log('second fires');
-    setTimeout(function(){
-      console.log('second fires cb');
-      cb(null, 'I\'m second');
-    }, 500);
-  },
-  'third' : function(cb) {
-    console.log('third fires');
-    setTimeout(function(){
-      console.log('third fires cb');
-      cb(null, 'I\'m third');
-    }, 300);
-  }
-},
-function(err, results) {
-  console.log(results);
-});
-*/
