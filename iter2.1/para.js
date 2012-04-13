@@ -8,7 +8,7 @@ var numCPUs = os.cpus().length;
 var paraLize = function(tasks, callback) {
   var results = {};
 //  var errors = {}; // consider option for making errors not break everything
-  var completed = _.keys(tasks).length;
+  var toComplete = _.keys(tasks).length;
     
   _.each(tasks, function(element, key){
     tasks[key](function(err){
@@ -19,9 +19,9 @@ var paraLize = function(tasks, callback) {
         callback = function() {};
       }
       else {
-        completed -= 1;
+        toComplete -= 1;
         results[key] = args;
-        if(completed === 0) {
+        if(toComplete === 0) { // sooo counterintuitive
           callback(err, results);
         }
       }
@@ -73,8 +73,17 @@ var childOut = (function(){
     childPointer : 0,
     giveOut: function (task_key) {
       var child_proc = this.children[this.childPointer].processHandle;
+      
       child_proc.send({'task_key':task_key});
-      return this;
+      
+      this.incChildPointer();
+      return child_proc;
+    },
+    incChildPointer : function() { // may gain some fancy logic in future
+      this.childPointer += 1;
+      if(this.childPointer >= this.children.length) {
+        this.childPointer = 0;
+      }
     }
   };
 
@@ -91,12 +100,31 @@ var childOut = (function(){
   return function(task_keys, callback) {
     var results = {};
 
-    var completed = task_keys.length;
+    var toComplete = task_keys.length;
+    
+    var observe = function(message) {
+      if(message.task_complete) {
+        if(!message.err) {
+          results[message.task_key] = message.result;
+          toComplete -= 1;
+
+          if(toComplete === 0) {
+            callback(null, results);
+          }
+        }
+        else {
+          callback(message.err);
+        }
+      }
+      else {
+        // process child messages
+      }
+    }
     
     childProcs.whenBorn(function(){
       _.each(task_keys, function(task_key){
         
-        childProcs.children
+        childProcs.giveOut(task_key).on('message', observe);
         
       })
       
