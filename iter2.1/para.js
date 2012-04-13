@@ -36,12 +36,12 @@ var childOut = (function(){
   var createChildTask = function(cb) {
     var child = {
       processHandle: cp.fork(__dirname + '/child.js'),
-      ready: false,
+//      ready: false,
       numTasks: 0
     }
     
     child.processHandle.on('message', function(m){
-      child.ready = m.ready;
+//      child.ready = m.ready;
       cb(null, child);
     });
   };
@@ -53,58 +53,50 @@ var childOut = (function(){
   var childProcs = {
     ready : false,
     children : null,
-    whenReady : function(callback){ 
+    whenBorn : function(callback){ 
       //just a simple (very simple) promise to execute all 
-      //when child procs are ready
+      //when child procs are born, "children are born"
       var self = this;
       
       if(typeof callback === 'function') {
-        self.readyCbs.push(callback);
+        self.bornCallbacks.push(callback);
       }
       
       if(self.ready) {
-        _.each(self.readyCbs, function(i, readyCallback, list) {
-          readyCallback();
+        _.each(self.bornCallbacks, function(i, bornCallback, list) {
+          bornCallback();
           list[i] = function() {}
         });
       }
     },
-    readyCbs : []
+    bornCallbacks : [],
+    childPointer : 0,
+    giveOut: function (task_key) {
+      var child_proc = this.children[this.childPointer].processHandle;
+      child_proc.send({'task_key':task_key});
+      return this;
+    }
   };
 
   paraLize(createChildTasks, function(err, children){
     childProcs.children = _.toArray(children); // Array is just more comfortable (as it seems)
     childProcs.ready = true;
-    childProcs.whenReady();
+    childProcs.whenBorn();
   });
   
   /**
    * Tasks are passed in as an array of keys in some global tasks registry
    * child procs require or (include it in some way) that task registry
    */
-  return function(tasks, callback) {
+  return function(task_keys, callback) {
     var results = {};
 
-    var completed = _.keys(tasks).length;
+    var completed = task_keys.length;
     
-    childProcs.whenReady(function(){
-      _.each(tasks, function(element, key){
+    childProcs.whenBorn(function(){
+      _.each(task_keys, function(task_key){
         
-        tasks[key](function(err){
-          var args = Array.prototype.slice.call(arguments, 1);
-        
-          if(err) {
-            callback(err);
-            callback = function() {};
-          }
-          else {
-            completed -= 1;
-            results[key] = args;
-            if(completed === 0) {
-              callback(err, results);
-            }
-          }
-        })
+        childProcs.children
         
       })
       
