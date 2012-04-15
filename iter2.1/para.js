@@ -36,12 +36,10 @@ var childOut = (function(){
   var createChildTask = function(cb) {
     var child = {
       processHandle: cp.fork(__dirname + '/child.js'),
-//      ready: false,
       numTasks: 0
     }
     
     child.processHandle.on('message', function(m){
-//      child.ready = m.ready;
       cb(null, child);
     });
   };
@@ -63,7 +61,7 @@ var childOut = (function(){
       }
       
       if(self.ready) {
-        _.each(self.bornCallbacks, function(i, bornCallback, list) {
+        _.each(self.bornCallbacks, function(bornCallback, i, list) {
           bornCallback();
           list[i] = function() {}
         });
@@ -72,7 +70,7 @@ var childOut = (function(){
     bornCallbacks : [],
     childPointer : 0,
     giveOut: function (task_key) {
-      var child_proc = this.children[this.childPointer].processHandle;
+      var child_proc = this.children[this.childPointer][0].processHandle;
       
       child_proc.send({'task_key':task_key});
       

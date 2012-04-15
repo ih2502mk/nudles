@@ -9,3 +9,7 @@ var _ = require('underscore');
 var para = require('./para.js');
 var paraLize = para.paraLize;
 var childOut = para.childOut;
+
+childOut(['task1', 'task2', 'task3'], function(err, results) {
+  console.log(results);
+})
