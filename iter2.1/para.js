@@ -70,7 +70,7 @@ var childOut = (function(){
     bornCallbacks : [],
     childPointer : 0,
     giveOut: function (task_key) {
-      var child_proc = this.children[this.childPointer][0].processHandle;
+      var child_proc = this.children[this.childPointer].processHandle;
       
       child_proc.send({'task_key':task_key});
       
@@ -86,7 +86,12 @@ var childOut = (function(){
   };
 
   paraLize(createChildTasks, function(err, children){
-    childProcs.children = _.toArray(children); // Array is just more comfortable (as it seems)
+    childProcs.children = [];
+    for (var key in children) {
+      if(Object.prototype.hasOwnProperty.call(children, key)) {
+        childProcs.children[childProcs.children.length] = children[key][0];
+      }
+    }
     childProcs.ready = true;
     childProcs.whenBorn();
   });
