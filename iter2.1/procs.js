@@ -13,3 +13,7 @@ var childOut = para.childOut;
 childOut(['task1', 'task2', 'task3'], function(err, results) {
   console.log(results);
 })
+//this fails
+childOut(['task3', 'task4', 'task5'], function(err, results) {
+  console.log(results);
+})
