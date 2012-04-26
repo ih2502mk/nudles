@@ -1,6 +1,17 @@
 var 
   containers = {}; // Collection of container objects
-
+  
+/**
+ * Construct a container object
+ * @param options String object which defines contents and behavior of container
+ *    - options.name - name, should be unique 
+ *    - options.nested - array of names of nested containers
+ *    - options.tplPlaceholder - result of rendering will be passed to template 
+ *    keyd with this value
+ *    - options.tplString - template string
+ *    - options.filler - function that gets content if there is no nested items, 
+ *    or a string that is content
+ */
 var Container = function(options) {
   this.nested = options.nested || [];
   this.name = options.name; // better be unique or namespaced but instace of String
@@ -10,6 +21,9 @@ var Container = function(options) {
   containers[this.name] = this;
 }
 
+/**
+ * Iteratively render a container and its nested items
+ */
 Container.prototype.render = function (cb) {
   var self = this,
   nesteds = self.nested.length,
@@ -55,7 +69,9 @@ Container.prototype.render = function (cb) {
   }
   
 }
-
+/**
+ * Applies locals to a template of particular container
+ */
 Container.prototype.template = function (locals) {
   // apply locals to this.tplString
   // need a way to include template engine semewhere here
