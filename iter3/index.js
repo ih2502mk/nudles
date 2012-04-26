@@ -21,11 +21,15 @@ app
 app.httpServer.listen(8080)
 
 
-var cnt = new Container({
-  name: 'hello'
-  
-})
+var cnt1 = new Container({
+  name: 'hello',
+  nested: ['goodbye']
+});
 
-cnt.render(function (err, result) {
+var cnt2 = new Container({
+  name: 'goodbye'
+});
+
+cnt1.render(function (err, result) {
   console.log(result);
 })
