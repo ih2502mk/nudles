@@ -1,7 +1,6 @@
 var tako = require('tako'),
 path = require('path'),
-app = tako(),
-Container = require('./containers.js').Container
+app = tako();
 
 app.route('/static/*').files(path.join(__dirname, 'static'))
 
@@ -19,17 +18,3 @@ app
 
 
 app.httpServer.listen(8080)
-
-
-var cnt1 = new Container({
-  name: 'hello',
-  nested: ['goodbye']
-});
-
-var cnt2 = new Container({
-  name: 'goodbye'
-});
-
-cnt1.render(function (err, result) {
-  console.log(result);
-})
