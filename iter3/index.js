@@ -1,7 +1,7 @@
 var tako = require('tako'),
 path = require('path'),
 app = tako(),
-Container = require('./containers.js').Container
+Containers = require('./containers.js').Containers
 
 app.route('/static/*').files(path.join(__dirname, 'static'))
 
@@ -20,16 +20,18 @@ app
 
 app.httpServer.listen(8080)
 
-
-var cnt1 = new Container({
+Containers.push({
+  type: 'NestContainer',
   name: 'hello',
   nested: ['goodbye']
 });
 
-var cnt2 = new Container({
-  name: 'goodbye'
-});
+Containers.push({
+  type: 'MarkupContainer',
+  name: 'goodbye',
+  filler: "Good Bye Filler string"
+})
 
-cnt1.render(function (err, result) {
+Containers.render('hello', function (err, result) {
   console.log(result);
 })
