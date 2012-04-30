@@ -1,20 +1,20 @@
 var Containers = require('./containers.js').Containers;
 
 Containers.push({
-  type: 'NestContainer',
   name: 'hello',
+  type: 'NestContainer',
   nested: ['goodbye', 'sionara']
 });
 
 Containers.push({
-  type: 'MarkupContainer',
   name: 'goodbye',
+  type: 'MarkupContainer',
   filler: "Good Bye Filler string"
 });
 
 Containers.push({
-  type: 'MarkupContainer',
   name: 'sionara',
+  type: 'MarkupContainer',
   filler: "Sionara Filler string"
 });
 
