@@ -18,11 +18,11 @@ var NestContainer = function(options) {
   this.nested = options.nested || [];
   this.name = options.name; // better be unique or namespaced but instace of String
   if (!options.tplString) {
-    this.tplString = "<ul>";
+    this.tplString = "<div>";
     for (var i = 0; i < this.nested.length; i++) {
-      this.tplString += "<li><%=" + this.nested[i] + "%></li>"
+      this.tplString += "<div><%=" + this.nested[i] + "%></div>"
     }
-    this.tplString += "</ul>";
+    this.tplString += "</div>";
   }
   else {
     this.tplString = options.tplString;
@@ -89,7 +89,7 @@ var ListContainer = function(options) {
   this.listFiller = options.listFiller;
   this.item = options.item || options.name + "_item";
   
-  var item_name;
+  var item_name = this.item;
   
   if(typeof Containers.containers[item_name] === 'undefined') {
     Containers.push({
@@ -103,16 +103,24 @@ util.inherits(ListContainer, BasicContainer);
 
 ListContainer.prototype.render = function(cb) {
   var self = this,
-  result = "";
+  results = [],
+  cntnrs = Containers.containers;
   
   self.listFiller(function(err, listData) {
     if(err) return cb(err);
     
-    listData.forEach(function(listDataItem) {
-      self.item.filler = function() {return listDataItem;}
-      self.item.render(function(err, str) {
+    var len = listData.length;
+    
+    listData.forEach(function(listDataItem, i) {
+      cntnrs[self.item].filler = function() {return listDataItem;}
+      cntnrs[self.item].render(function(err, str) {
         if (err) return cb(err);
-        result += str;
+        
+        results[i] += str;
+        
+        if(i === len) {
+          cb(null, self.template(results));
+        }
       });
     })
   })
