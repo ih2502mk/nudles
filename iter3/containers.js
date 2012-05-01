@@ -85,8 +85,8 @@ MarkupContainer.prototype.render = function(cb) {
 
 var ListContainer = function(options) {
   this.name = options.name; // better be unique or namespaced but instace of String
-  this.tplString = options.tplString || ("<span><%=" + this.name + "%></span>");
-  this.listFiller = options.listFiller;
+  this.tplString = options.tplString || ("<ul><% _.each(results, function(results) { %> <li><%= name %></li> <% }); %></ul>");
+  this.listFiller = options.listFiller || function(cb){cb(null, ['it\'s empty'])};
   this.item = options.item || options.name + "_item";
   
   var item_name = this.item;
@@ -119,7 +119,7 @@ ListContainer.prototype.render = function(cb) {
         results[i] += str;
         
         if(i === len) {
-          cb(null, self.template(results));
+          cb(null, self.template({"results":results}));
         }
       });
     })
