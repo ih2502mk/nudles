@@ -3,7 +3,7 @@ var util = require("util");
 var _ = require("underscore");
 
 var BasicContainer = function(options) {
-
+  this.name = options.name; // better be unique or namespaced but instace of String
 }
 
 /**
@@ -15,8 +15,9 @@ BasicContainer.prototype.template = function (locals) {
 }
 
 var NestContainer = function(options) {
+  NestContainer.super_.call(this, options);
+  
   this.nested = options.nested || [];
-  this.name = options.name; // better be unique or namespaced but instace of String
   if (!options.tplString) {
     this.tplString = "<div>";
     for (var i = 0; i < this.nested.length; i++) {
@@ -60,7 +61,8 @@ NestContainer.prototype.render = function (cb) {
 }
 
 var MarkupContainer = function(options) {
-  this.name = options.name; // better be unique or namespaced but instace of String
+  MarkupContainer.super_.call(this, options);
+  
   this.tplString = options.tplString || ("<span><%=" + this.name + "%></span>");
   this.filler = options.filler || "nothing";
 }
@@ -93,7 +95,8 @@ MarkupContainer.prototype.render = function(cb) {
 }
 
 var ListContainer = function(options) {
-  this.name = options.name; // better be unique or namespaced but instace of String
+  ListContainer.super_.call(this, options);
+  
   this.tplString = options.tplString || ("<ul><% _.each(results, function(result) { %> <li><%= result %></li> <% }); %></ul>");
   
   this.item = options.item || options.name + "_item";

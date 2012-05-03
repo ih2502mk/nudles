@@ -4,7 +4,7 @@ var Containers = require('./containers.js').Containers;
 //MarkupContainer with default options.
 Containers.push({
   name: 'goodbye',
-  type: 'MarkupContainer',
+  type: 'MarkupContainer'
 });
 
 assert(Containers.containers['goodbye'], 'Push a new container to a collection');
