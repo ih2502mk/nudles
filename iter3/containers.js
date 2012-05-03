@@ -70,16 +70,25 @@ util.inherits(MarkupContainer, BasicContainer);
 MarkupContainer.prototype.render = function(cb) {
   var self = this;
   
+  var tplLocals = {};
+  
   if (typeof self.filler === 'function') {
     self.filler(function(err, result) {
-      if(err) return cb(err);
-      cb(null, self.template(result));
+      if (err) return cb(err);
+      
+      if (typeof result === 'object') {
+        tplLocals = result;
+        return cb(null, self.template(tplLocals));
+      }
+      else {
+        tplLocals[self.name] = result;
+        return cb(null, self.template(tplLocals));
+      }
     })
   }
   else if (typeof self.filler === 'string') {
-    var locals = {};
-    locals[self.name] = self.filler;
-    cb(null, self.template(locals));
+    tplLocals[self.name] = self.filler;
+    return cb(null, self.template(tplLocals));
   }
 }
 
