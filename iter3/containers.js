@@ -149,7 +149,7 @@ ListContainer.prototype.render = function(cb) {
         results[i] = str;
         
         if(len === 0) {
-          cb(null, self.template({"results":results}));
+          return cb(null, self.template({"results":results}));
         }
       });
     })
@@ -176,7 +176,7 @@ var Containers = {
         self.containers[name].render(cb);
       }
       else {
-        cb(new Error("Container with name " + name + "does not exist."));
+        return cb(new Error("Container with name " + name + "does not exist."));
       }
     }
   };
