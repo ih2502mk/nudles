@@ -4,6 +4,8 @@ var _ = require("underscore");
 
 var BasicContainer = function(options) {
   this.name = options.name; // better be unique or namespaced but instace of String
+  this.cachePath = options.cachePath;
+  this.cacheKey = "";
 }
 
 /**
@@ -148,7 +150,7 @@ ListContainer.prototype.render = function(cb) {
         
         results[i] = str;
         
-        if(len === 0) {
+        if (len === 0) {
           return cb(null, self.template({"results":results}));
         }
       });
@@ -157,28 +159,28 @@ ListContainer.prototype.render = function(cb) {
 }
 
 var Containers = {
-    "push": function(options) {
-      var self = this;
-      if(options.type && self.constructors[options.type]) {
-        self.containers[options.name] = new self.constructors[options.type](options);
-      }
-    },
-    "constructors" : {
-      "BasicContainer" : BasicContainer,
-      "NestContainer" : NestContainer,
-      "ListContainer" : ListContainer,
-      "MarkupContainer" : MarkupContainer
-    },
-    containers : {},
-    render: function(name, cb) {
-      var self = this;
-      if(self.containers[name]) {
-        self.containers[name].render(cb);
-      }
-      else {
-        return cb(new Error("Container with name " + name + "does not exist."));
-      }
+  "constructors" : {
+    "BasicContainer" : BasicContainer,
+    "NestContainer" : NestContainer,
+    "ListContainer" : ListContainer,
+    "MarkupContainer" : MarkupContainer
+  },
+  "containers" : {},
+  "push" : function(options) {
+    var self = this;
+    if (options.type && self.constructors[options.type]) {
+      self.containers[options.name] = new self.constructors[options.type](options);
     }
-  };
+  },
+  "render" : function(name, cb) {
+    var self = this;
+    if (self.containers[name]) {
+      self.containers[name].render(cb);
+    }
+    else {
+      return cb(new Error("Container with name " + name + "does not exist."));
+    }
+  }
+};
 
 module.exports.Containers = Containers;
