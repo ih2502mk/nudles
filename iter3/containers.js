@@ -4,7 +4,7 @@ var _ = require("underscore");
 
 var BasicContainer = function(options) {
   this.name = options.name; // better be unique or namespaced but instace of String
-  this.cachePath = options.cachePath;
+  this.cachePattern = options.cachePattern;
   this.cacheKey = "";
 }
 
