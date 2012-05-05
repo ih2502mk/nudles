@@ -2,6 +2,8 @@ var util = require("util");
 
 var _ = require("underscore");
 
+var cache = require("./cache.js").cache;
+
 var BasicContainer = function(options) {
   this.name = options.name; // better be unique or namespaced but instace of String
   this.cachePattern = options.cachePattern;
@@ -174,12 +176,24 @@ var Containers = {
   },
   "render" : function(name, cb) {
     var self = this;
+    
     if (self.containers[name]) {
-      self.containers[name].render(cb);
+      if (cache.valueExist(self.containers[name].cachePattern)) {
+        cache.get(self.containers[name].cachePattern, cb);
+      }
+      else {
+        var cacher = function(err, result) {
+          cache.set(self.containers[name].cachePattern, result);
+          cb(err, result);
+        }
+        self.containers[name].render(cacher);
+      }
     }
     else {
-      return cb(new Error("Container with name " + name + "does not exist."));
+      cb(new Error("Container with name " + name + "does not exist."));
     }
+    
+    return self;
   }
 };
 
