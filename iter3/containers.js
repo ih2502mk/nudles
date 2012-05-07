@@ -7,7 +7,8 @@ var cache = require("./cache.js").cache;
 //TODO: all containers should be able to result with pure JSON not applied to templates
 
 //TODO: CSS upstream - every container must be able to add it's own css the 
-//upper container will then concatenate all CSS and save it as a bundle
+//upper topmost container will then concatenate all CSS and save it as a bundle
+//consider less and stylus preprocessing
 
 //TODO: abstract out temlpate engine, ie remove default 
 //tpl strings out of constructors into some pluggable thing

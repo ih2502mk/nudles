@@ -1,12 +1,13 @@
 
 var Cache = function() {
   this.memoryStorage = {};
+  this.patterns = [];
 }
 
 /**
  *  pattern = "level/html:authUser/user_id:viewed/post/post_id"
  *  =>
- *  key = "html:456:123" - ambiguity ???
+ *  key = self.patterns.indexOf(pattern).toString() + "@" + "html:456:123"
  */
 
 Cache.prototype.keyGen = function(pattern) {
