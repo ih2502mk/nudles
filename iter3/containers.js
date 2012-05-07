@@ -4,6 +4,14 @@ var _ = require("underscore");
 
 var cache = require("./cache.js").cache;
 
+//TODO: all containers should be able to result with pure JSON not applied to templates
+
+//TODO: CSS upstream - every container must be able to add it's own css the 
+//upper container will then concatenate all CSS and save it as a bundle
+
+//TODO: abstract out temlpate engine, ie remove default 
+//tpl strings out of constructors into some pluggable thing
+
 var BasicContainer = function(options) {
   this.name = options.name; // better be unique or namespaced but instace of String
   this.cachePattern = options.cachePattern;
@@ -18,6 +26,9 @@ BasicContainer.prototype.template = function (locals) {
   return _.template(self.tplString, locals);
 }
 
+//TODO: Add filler downstream - nested container itself could have filler
+//data result of that filler will be put into children 
+//this adds ability to put more repeatable blocks in one place
 var NestContainer = function(options) {
   NestContainer.super_.call(this, options);
   
