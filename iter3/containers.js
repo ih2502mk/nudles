@@ -52,7 +52,16 @@ var NestContainer = function(options) {
    * the same as names of nested containers
    * if they do not match render callback will not be invoked
    */
-  this.filler = options.filler || false;
+  var self = this;
+  this.filler = options.filler || function (cb) {
+    var fakeNestFillerData = {};
+    
+    for(var i = self.nested.length; i > 0; i--  ) {
+      fakeNestFillerData[self.nested[(i - 1)]] = null;
+    }
+    
+    return cb(null, fakeNestFillerData);
+  };
 }
 
 util.inherits(NestContainer, BasicContainer);
@@ -67,55 +76,37 @@ NestContainer.prototype.render = function (cb) {
     cb(err, self.template(results));
   };
   
-  if (typeof self.filler === 'function') {
-    self.filler( function(err, nestFillerData) {
-      if(err) return cb(err);
-      
-      for ( var key in nestFillerData ) {
-        
-        if ( nestFillerData.hasOwnProperty(key) 
-          && self.nested[key] instanceof BasicContainer ) {
-          
-          self.nested[key].filler = function (cb) {
-            cb(null, nestFillerData[key]);
+  self.filler( function(err, nestFillerData) {
+    if(err) return cb(err);
+
+    for ( var nested_name in nestFillerData ) {
+
+      if ( nestFillerData.hasOwnProperty(nested_name) 
+        && cntnrs[nested_name] instanceof BasicContainer ) {
+
+        if( nestFillerData[nested_name] ) { 
+          cntnrs[nested_name].filler = function (cb) {
+            cb(null, nestFillerData[nested_name]);
           }
-          
-          self.nested[key].render(function(err, str) {
-            if (err) {
-              cb(err);
-              finalCb = function(){};
-            }
-
-            nesteds -= 1;
-
-            results[key] = str;
-
-            if (nesteds === 0) {
-              finalCb(err, results)
-            }
-          })
         }
+
+        cntnrs[nested_name].render(function(err, str) {
+          if (err) {
+            cb(err);
+            finalCb = function(){};
+          }
+
+          nesteds -= 1;
+
+          results[nested_name] = str;
+
+          if (nesteds === 0) {
+            finalCb(err, results)
+          }
+        })
       }
-    })
-  }
-  else {
-    self.nested.forEach(function(nested_name){
-      cntnrs[nested_name].render(function(err, str) {
-        if (err) {
-          cb(err);
-          finalCb = function(){};
-        }
-
-        nesteds -= 1;
-
-        results[nested_name] = str;
-
-        if (nesteds === 0) {
-          finalCb(err, results)
-        }
-      });
-    });    
-  }
+    }
+  });
 }
 
 var MarkupContainer = function(options) {

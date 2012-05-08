@@ -88,6 +88,29 @@ Containers.render('hello', function (err, result) {
   console.log("NestContainer with template - passed");
 });
 
+//NestContainer with downstream filler and template
+Containers.push({
+  name: 'hello',
+  type: 'NestContainer',
+  nested: ['goodbye', 'sionara'],
+  tplString: "<div><p><%= goodbye %></p><hr /><p><%= sionara %></p></div>",
+  filler: function(cb) {
+    cb(null, {
+      "goodbye" : "dnstrm string goodbye value",
+      "sionara" : {
+        "foo" : "dnstrm foo",
+        "bar" : "dnstrm bar",
+        "baz" : "dnstrm baz"
+      }
+    })
+  }
+});
+
+Containers.render('hello', function (err, result) {
+  assert.equal(result, '<div><p><span>dnstrm string goodbye value</span></p><hr /><p><div>dnstrm foo</div><p>dnstrm bar</p><span>dnstrm baz<span></p></div>');
+  console.log("NestContainer with downstream filler and template - passed");
+});
+
 //Containers.push({
 //  name: 'listing',
 //  type: 'ListContainer',
