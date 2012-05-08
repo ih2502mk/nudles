@@ -111,14 +111,16 @@ Containers.render('hello', function (err, result) {
   console.log("NestContainer with downstream filler and template - passed");
 });
 
-//Containers.push({
-//  name: 'listing',
-//  type: 'ListContainer',
-//  listFiller: function(cb) {
-//    cb(null, ['one', 'two', 'three', 'four']);
-//  }
-//});
-//
-//Containers.render('listing', function (err, result) {
-//  console.log(result);
-//});
+//List container with array of strings filler
+Containers.push({
+  name: 'listing',
+  type: 'ListContainer',
+  listFiller: function(cb) {
+    cb(null, ['one', 'two', 'three', 'four']);
+  }
+});
+
+Containers.render('listing', function (err, result) {
+  assert.equal(result, '<ul><li><span>one</span></li><li><span>two</span></li><li><span>three</span></li><li><span>four</span></li></ul>');
+  console.log("List container with array of strings filler - passed");
+});

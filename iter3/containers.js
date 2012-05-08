@@ -158,7 +158,7 @@ MarkupContainer.prototype.render = function(cb) {
 var ListContainer = function(options) {
   ListContainer.super_.call(this, options);
   
-  this.tplString = options.tplString || ("<ul><% _.each(results, function(result) { %> <li><%= result %></li> <% }); %></ul>");
+  this.tplString = options.tplString || ("<ul><% _.each(results, function(result) { %><li><%= result %></li><% }); %></ul>");
   
   this.item = options.item || options.name + "_item";
   
@@ -191,18 +191,24 @@ ListContainer.prototype.render = function(cb) {
     var len = listData.length;
     
     listData.forEach(function(listDataItem, i) {
-      cntnrs[self.item].filler = function(filler_cb) {
-        var normalized = {};
-        if( typeof listDataItem === 'string') {
-          normalized[self.item] = listDataItem;
-          
-          return filler_cb(null, normalized);
-        }
-        
-        return filler_cb(null, listDataItem);
-      }
       
-      cntnrs[self.item].render(function(err, str) {
+      var containerCopy = Object.create(cntnrs[self.item], {
+        "filler": {
+          value : function(filler_cb) {
+            var normalized = {};
+            if( typeof listDataItem === 'string') {
+              normalized[self.item] = listDataItem;
+
+              return filler_cb(null, normalized);
+            }
+
+            return filler_cb(null, listDataItem);
+          },
+          enumerable: true
+        }
+      });
+      
+      containerCopy.render(function(err, str) {
         if (err) return cb(err);
         
         len -= 1;
