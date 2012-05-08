@@ -4,7 +4,8 @@ var _ = require("underscore");
 
 var cache = require("./cache.js").cache;
 
-//TODO: all containers should be able to result with pure JSON not applied to templates
+//TODO: all containers should be able to result with pure JSON 
+//not applied to templates
 
 //TODO: CSS upstream - every container must be able to add it's own css the 
 //upper topmost container will then concatenate all CSS and save it as a bundle
@@ -27,13 +28,12 @@ BasicContainer.prototype.template = function (locals) {
   return _.template(self.tplString, locals);
 }
 
-//TODO: Add filler downstream - nested container itself could have filler
-//data result of that filler will be put into children 
-//this adds ability to put more repeatable blocks in one place
+
 var NestContainer = function(options) {
   NestContainer.super_.call(this, options);
   
   this.nested = options.nested || [];
+  
   if (!options.tplString) {
     this.tplString = "<div>";
     for (var i = 0; i < this.nested.length; i++) {
@@ -44,6 +44,15 @@ var NestContainer = function(options) {
   else {
     this.tplString = options.tplString;
   }
+  
+  /**
+   * Downstream filler
+   * Hardcore assumption:
+   * filler must callback with result object root keys of which are 
+   * the same as names of nested containers
+   * if they do not match render callback will not be invoked
+   */
+  this.filler = options.filler || false;
 }
 
 util.inherits(NestContainer, BasicContainer);
@@ -54,26 +63,59 @@ NestContainer.prototype.render = function (cb) {
   results = {},
   cntnrs = Containers.containers,
   
-  innerCb = function(err, results) {
+  finalCb = function(err, results) {
     cb(err, self.template(results));
   };
   
-  self.nested.forEach(function(nested_name){
-    cntnrs[nested_name].render(function(err, str) {
-      if (err) {
-        cb(err);
-        innerCb = function(){};
+  if (typeof self.filler === 'function') {
+    self.filler( function(err, nestFillerData) {
+      if(err) return cb(err);
+      
+      for ( var key in nestFillerData ) {
+        
+        if ( nestFillerData.hasOwnProperty(key) 
+          && self.nested[key] instanceof BasicContainer ) {
+          
+          self.nested[key].filler = function (cb) {
+            cb(null, nestFillerData[key]);
+          }
+          
+          self.nested[key].render(function(err, str) {
+            if (err) {
+              cb(err);
+              finalCb = function(){};
+            }
+
+            nesteds -= 1;
+
+            results[key] = str;
+
+            if (nesteds === 0) {
+              finalCb(err, results)
+            }
+          })
+        }
       }
+    })
+  }
+  else {
+    self.nested.forEach(function(nested_name){
+      cntnrs[nested_name].render(function(err, str) {
+        if (err) {
+          cb(err);
+          finalCb = function(){};
+        }
 
-      nesteds -= 1;
+        nesteds -= 1;
 
-      results[nested_name] = str;
+        results[nested_name] = str;
 
-      if (nesteds === 0) {
-        innerCb(err, results)
-      }
-    });
-  });
+        if (nesteds === 0) {
+          finalCb(err, results)
+        }
+      });
+    });    
+  }
 }
 
 var MarkupContainer = function(options) {
@@ -165,7 +207,9 @@ ListContainer.prototype.render = function(cb) {
         results[i] = str;
         
         if (len === 0) {
-          return cb(null, self.template({"results":results}));
+          return cb(null, self.template({
+            "results":results
+          }));
         }
       });
     })
