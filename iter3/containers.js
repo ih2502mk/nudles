@@ -48,9 +48,10 @@ var NestContainer = function(options) {
   /**
    * Downstream filler
    * Hardcore assumption:
-   * filler must callback with result object root keys of which are 
+   * filler must callback with result object, root keys of which are 
    * the same as names of nested containers
-   * if they do not match render callback will not be invoked
+   * if they do not match own fillers of nested containers will be used.
+   * Has destructive behavior: will change filler functions of nested containers.
    */
   var self = this;
   this.filler = options.filler || function (cb) {
@@ -83,14 +84,25 @@ NestContainer.prototype.render = function (cb) {
 
       if ( nestFillerData.hasOwnProperty(nested_name) 
         && cntnrs[nested_name] instanceof BasicContainer ) {
-
-        if( nestFillerData[nested_name] ) { 
-          cntnrs[nested_name].filler = function (cb) {
-            cb(null, nestFillerData[nested_name]);
-          }
+        
+        var containerCopy;
+        if( nestFillerData[nested_name] ) {
+          
+          containerCopy = Object.create(cntnrs[nested_name], {
+            "filler" : {
+              value: function (cb) {
+                cb(null, nestFillerData[nested_name]);
+              },
+              enumerable : true
+            }
+          });
+          
         }
-
-        cntnrs[nested_name].render(function(err, str) {
+        else {
+          containerCopy = cntnrs[nested_name];
+        }
+        
+        containerCopy.render(function(err, str) {
           if (err) {
             cb(err);
             finalCb = function(){};
@@ -101,7 +113,7 @@ NestContainer.prototype.render = function (cb) {
           results[nested_name] = str;
 
           if (nesteds === 0) {
-            finalCb(err, results)
+            return finalCb(err, results);
           }
         })
       }
