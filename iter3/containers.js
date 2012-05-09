@@ -253,16 +253,16 @@ var Containers = {
     var self = this;
     
     if (self.containers[name]) {
-      if (cache.valueExist(self.containers[name].cachePattern)) {
-        cache.get(self.containers[name].cachePattern, cb);
-      }
-      else {
+//      if (cache.valueExist(self.containers[name].cachePattern)) {
+//        cache.get(self.containers[name].cachePattern, cb);
+//      }
+//      else {
         var cacher = function(err, result) {
-          cache.set(self.containers[name].cachePattern, result);
+//          cache.set(self.containers[name].cachePattern, result);
           cb(err, result);
         }
         self.containers[name].render(cacher);
-      }
+//      }
     }
     else {
       cb(new Error("Container with name " + name + "does not exist."));

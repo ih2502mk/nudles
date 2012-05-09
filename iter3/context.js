@@ -21,7 +21,22 @@ var Context = function() {
     "post" : {
       "post_id" : 123,
       "data" : {}
-    }
+    },
+    
+    "tags" : [
+      {
+        "tag_id" : 12,
+        "tag_name" : 'foo'
+      },
+      {
+        "tag_id" : 14,
+        "tag_name" : 'bar'
+      },
+      {
+        "tag_id" : 18,
+        "tag_name" : 'baz'
+      }
+    ]
     
   }
 }
