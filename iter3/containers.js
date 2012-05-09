@@ -14,6 +14,16 @@ var cache = require("./cache.js").cache;
 //TODO: abstract out temlpate engine, ie remove default 
 //tpl strings out of constructors into some pluggable thing
 
+//TODO: have containers be build from files, 
+//sugested directory structure:
+//
+//  custom-containers/          #stores all custom containers
+//    posts-list/               #directory for particular custom container
+//      posts-list.options.js   #options object of a container
+//      posts-list.tpl          #template for a container
+//      posts-list.less         #css for a container
+//      posts-list.filler.js    #filler function for a container
+
 var BasicContainer = function(options) {
   this.name = options.name; // better be unique or namespaced but instace of String
   this.cachePattern = options.cachePattern;
