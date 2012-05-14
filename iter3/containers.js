@@ -24,6 +24,11 @@ var cache = require("./cache.js").cache;
 //      posts-list.less         #css for a container
 //      posts-list.filler.js    #filler function for a container
 
+//TODO: review caching approach.
+//Caching should keyed by arguments to filler function.
+//Since filler does not have arguments in our implementation
+//we should review fillers as aconcept.
+
 var BasicContainer = function(options) {
   this.name = options.name; // better be unique or namespaced but instace of String
   this.cachePattern = options.cachePattern;
