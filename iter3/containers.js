@@ -28,6 +28,7 @@ var cache = require("./cache.js").cache;
 //Caching should keyed by arguments to filler function.
 //Since filler does not have arguments in our implementation
 //we should review fillers as aconcept.
+//UPD: fillers are good they are separated, caching should be separated as well
 
 var BasicContainer = function(options) {
   this.name = options.name; // better be unique or namespaced but instace of String
@@ -43,6 +44,9 @@ BasicContainer.prototype.template = function (locals) {
   return _.template(self.tplString, locals);
 }
 
+BasicContainer.prototype.render = function (cb) {
+  // betterplace for caching
+}
 
 var NestContainer = function(options) {
   NestContainer.super_.call(this, options);
@@ -66,7 +70,6 @@ var NestContainer = function(options) {
    * filler must callback with result object, root keys of which are 
    * the same as names of nested containers
    * if they do not match own fillers of nested containers will be used.
-   * Has destructive behavior: will change filler functions of nested containers.
    */
   var self = this;
   this.filler = options.filler || function (cb) {
@@ -258,16 +261,7 @@ var Containers = {
     var self = this;
     
     if (self.containers[name]) {
-//      if (cache.valueExist(self.containers[name].cachePattern)) {
-//        cache.get(self.containers[name].cachePattern, cb);
-//      }
-//      else {
-        var cacher = function(err, result) {
-//          cache.set(self.containers[name].cachePattern, result);
-          cb(err, result);
-        }
-        self.containers[name].render(cacher);
-//      }
+      self.containers[name].render(cb);
     }
     else {
       cb(new Error("Container with name " + name + "does not exist."));
