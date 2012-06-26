@@ -29,6 +29,11 @@ var cache = require("./cache.js").cache;
 //Since filler does not have arguments in our implementation
 //we should review fillers as aconcept.
 //UPD: fillers are good they are separated, caching should be separated as well
+//UPD: Attach caching using aspect-oriented aproach
+
+//TODO: pseudonames for nested templates in order to enable haveing nest 
+//containers contain different children. 
+//options.nested should be an object -- needs review
 
 var BasicContainer = function(options) {
   this.name = options.name; // better be unique or namespaced but instace of String
